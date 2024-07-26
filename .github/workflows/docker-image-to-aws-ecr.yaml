@@ -44,6 +44,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check tag
+        run: echo ${{ inputs.IMAGE_TAG }}
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
