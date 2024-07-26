@@ -11,6 +11,17 @@ on:
         description: 'Tag name'
         required: true
         type: string
+    secrets:
+      AWS_REGION:
+        description: 'AWS region e.g. eu-west-2'
+        required: true
+      AWS_ECR:
+        description: 'AWS ECR name e.g. public.ecr.aws/12345abc'
+        required: true
+      AWS_ACCOUNT_ID:
+        description: 'AWS account ID e.g. 1234567890'
+        required: true
+
 #  push:
 #    tags:
 #      - 'v[0-9]+'
