@@ -1,0 +1,16 @@
+linters:
+  enable:
+    - govet
+    - golint
+    - staticcheck
+    - errcheck
+    - gocyclo
+    - gofmt
+    - goimports
+    - unparam
+    - deadcode
+    - ineffassign
+    - structcheck
+    - varcheck
+    - unused
+    - typecheck
