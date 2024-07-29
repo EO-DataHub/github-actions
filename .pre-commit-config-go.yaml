@@ -9,7 +9,9 @@ repos:
       -   id: check-merge-conflict
       -   id: detect-private-key
 
-  -   repo: https://github.com/dnephin/pre-commit-golang
-      rev: master
+
+  -   repo: https://github.com/pre-commit/mirrors-golangci-lint
+      rev: v1.42.1  # Use the latest version
       hooks:
-        - id: go-lint
+        - id: golangci-lint
+
