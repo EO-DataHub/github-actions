@@ -1,0 +1,23 @@
+repos:
+  -   repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v2.3.0
+      hooks:
+      -   id: check-yaml
+      # Disabled so that we're not initially modifying files
+      #-   id: end-of-file-fixer
+      #-   id: trailing-whitespace
+      -   id: check-merge-conflict
+      -   id: detect-private-key
+
+  -   repo: https://github.com/pycqa/isort
+      rev: 5.13.2
+      hooks:
+        - id: isort
+          name: isort python
+          args: [ --check, --diff, --profile, black ]
+
+  -   repo: https://github.com/golangci/golangci-lint-action
+      rev: 6.0.1
+      hooks:
+      -   id: golangci linter
+          args: [ --check ]
