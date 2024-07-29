@@ -16,8 +16,7 @@ repos:
           name: isort python
           args: [ --check, --diff, --profile, black ]
 
-  -   repo: https://github.com/golangci/golangci-lint-action
-      rev: 6.0.1
+  -   repo: https://github.com/dnephin/pre-commit-golang
+      rev: master
       hooks:
-      -   id: golangci linter
-          args: [ --check ]
+        - id: golangci-lint
