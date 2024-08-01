@@ -16,6 +16,7 @@ repos:
           name: eslint
           entry: eslint
           language: node
+          minimum_pre_commit_version: 2
           types: [ javascript, jsx ]
 
   -   repo: https://github.com/pre-commit/mirrors-stylelint
