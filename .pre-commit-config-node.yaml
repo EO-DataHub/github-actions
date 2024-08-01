@@ -10,15 +10,13 @@ repos:
       -   id: detect-private-key
 
   -   repo: https://github.com/pre-commit/mirrors-eslint
-      rev: v8.0.0
+      rev: v9.8.0
       hooks:
         - id: eslint
           name: eslint
           entry: eslint
           language: node
           types: [ javascript, jsx ]
-          additional_dependencies:
-            - eslint@4.15.0
 
   -   repo: https://github.com/pre-commit/mirrors-stylelint
       rev: v13.13.1
