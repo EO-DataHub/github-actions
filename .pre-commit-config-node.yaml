@@ -1,0 +1,28 @@
+repos:
+  -   repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v2.3.0
+      hooks:
+      -   id: check-yaml
+      # Disabled so that we're not initially modifying files
+      #-   id: end-of-file-fixer
+      #-   id: trailing-whitespace
+      -   id: check-merge-conflict
+      -   id: detect-private-key
+
+  -   repo: https://github.com/pre-commit/mirrors-eslint
+      rev: v8.0.0
+      hooks:
+        - id: eslint
+          name: eslint
+          entry: eslint
+          language: node
+          types: [ javascript, jsx ]
+
+  -   repo: https://github.com/pre-commit/mirrors-stylelint
+      rev: v13.13.1
+      hooks:
+        - id: stylelint
+          name: stylelint
+          entry: stylelint
+          language: node
+          types: [ css, scss, less ]
