@@ -17,12 +17,3 @@ repos:
           entry: eslint
           language: node
           types: [ javascript, jsx ]
-
-  -   repo: https://github.com/pre-commit/mirrors-stylelint
-      rev: v13.13.1
-      hooks:
-        - id: stylelint
-          name: stylelint
-          entry: stylelint
-          language: node
-          types: [ css, scss, less ]
