@@ -6,7 +6,9 @@ on:
         description: "Github ref name"
         type: string
     outputs:
-      image-tag: ${{ jobs.tag.outputs.image-tag }}
+      image-tag:
+        description: "Docker image tag"
+        value: ${{ jobs.tag.outputs.image-tag }}
 jobs:
   tag:
     name: Extract Docker image tag
