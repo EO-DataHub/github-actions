@@ -1,0 +1,26 @@
+name: Get-Docker-Tag
+on:
+  workflow_call:
+    inputs:
+      github-ref:
+        description: "Github ref name"
+        type: string
+    outputs:
+      image-tag: ${{ jobs.tag.outputs.tag }}
+jobs:
+  tag:
+    name: Extract Docker image tag
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - id: tag
+        run: |
+          if [[ ${{ inputs.github-ref }} == main ]]; then
+            echo tag=latest >> $GITHUB_OUTPUT
+          elif [[ ${{ inputs.github-ref }} =~ ^v[0-9]+ ]]; then
+            echo tag=$(echo ${{ inputs.github-ref }} | sed 's/^v//') >> $GITHUB_OUTPUT
+          else
+            echo tag=${{ inputs.github-ref }} >> $GITHUB_OUTPUT
+          fi
+      - run: echo tag=${{ steps.tag.outputs.tag }}
