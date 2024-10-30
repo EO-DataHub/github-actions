@@ -3,7 +3,12 @@ name: Unit tests
 on:
   pull_request:
   workflow_call:
-
+    inputs:
+      PYTHON_VERSION:
+        description: 'Python version, eg 3.11'
+        default: '3.11'
+        type: string
+    
 jobs:
   unit-testing:
     runs-on: ubuntu-latest
@@ -15,7 +20,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.11
+          python-version: ${{ inputs.PYTHON_VERSION }}
           cache: 'pip'
           cache-dependency-path: |
             requirements.txt
