@@ -3,11 +3,11 @@ on:
   workflow_call:
     inputs:
       github-ref:
-        description: "Github ref name"
+        description: Github ref name
         type: string
     outputs:
       image-tag:
-        description: "Docker image tag"
+        description: Docker image tag
         value: ${{ jobs.tag.outputs.image-tag }}
 jobs:
   tag:
@@ -16,13 +16,17 @@ jobs:
     outputs:
       image-tag: ${{ steps.tag.outputs.tag }}
     steps:
+      - run: "echo github ref: ${{ inputs.github-ref }}"
       - id: tag
         run: |
           if [[ ${{ inputs.github-ref }} == main ]]; then
+            echo main branch
             echo tag=latest >> $GITHUB_OUTPUT
           elif [[ ${{ inputs.github-ref }} =~ ^v[0-9]+ ]]; then
+            echo versioned tag
             echo tag=$(echo ${{ inputs.github-ref }} | sed 's/^v//') >> $GITHUB_OUTPUT
           else
+            echo generic ref
             echo tag=${{ inputs.github-ref }} >> $GITHUB_OUTPUT
           fi
-      - run: echo tag=${{ steps.tag.outputs.tag }}
+      - run: "echo tag: ${{ steps.tag.outputs.tag }}"
