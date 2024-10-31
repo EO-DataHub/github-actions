@@ -2,6 +2,11 @@ name: Security scan
 on:
   pull_request:
   workflow_call:
+    inputs:
+      ENABLE_BANDIT:
+        description: 'Enable the Bandit scanner - useful for Python only'
+        default: true
+        type: boolean
 jobs:
   build:
     name: Check for vulnerabilities
@@ -12,6 +17,7 @@ jobs:
 
       - name: Security check - Bandit
         uses: mdegis/bandit-action@v1.0.1
+        if: ${{ inputs.ENABLE_BANDIT }}
         with:
           path: "."
           level: high
