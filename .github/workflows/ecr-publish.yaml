@@ -11,10 +11,6 @@ on:
         description: Tag name
         required: true
         type: string
-      AWS_REGION:
-        description: AWS region e.g. eu-west-2
-        required: true
-        type: string
       AWS_ROLE_ARN:
         description: AWS role ARN e.g. arn:aws:iam::1234567890:role/role-name
         required: true
@@ -38,7 +34,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ inputs.AWS_ROLE_ARN }}
-          aws-region: ${{ inputs.AWS_REGION }}
+          aws-region: us-east-1 # This is the region for the public ECR
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
