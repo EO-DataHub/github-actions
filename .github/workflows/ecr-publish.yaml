@@ -50,6 +50,9 @@ jobs:
           registry-type: public
           region: ${{ inputs.AWS_REGION }}
 
+      - name: Check ECR repo
+        run: echo ${{ steps.login-ecr-public.outputs.registry }}
+
         # This will cache Docker layers.
         # We could also cache the cache mounts used in the Dockerfile but do not,
         # see https://docs.docker.com/build/ci/github-actions/cache/
