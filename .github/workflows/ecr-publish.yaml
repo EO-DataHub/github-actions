@@ -19,10 +19,6 @@ on:
         description: AWS role ARN e.g. arn:aws:iam::1234567890:role/role-name
         required: true
         type: string
-      AWS_ECR:
-        description: AWS ECR name e.g. public.ecr.aws/12345abc
-        required: true
-        type: string
 
 jobs:
   docker:
@@ -52,6 +48,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
         with:
           registry-type: public
+          region: ${{ inputs.AWS_REGION }}
 
         # This will cache Docker layers.
         # We could also cache the cache mounts used in the Dockerfile but do not,
@@ -60,7 +57,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: ${{ inputs.AWS_ECR }}/${{ inputs.IMAGE_NAME }}:${{ inputs.IMAGE_TAG }}
+          tags: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.IMAGE_NAME }}:${{ inputs.IMAGE_TAG }}
           build-args: |
             GIT_REF_NAME=${{ github.ref_name }}
             GIT_SHA=${{ github.sha }}
