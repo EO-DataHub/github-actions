@@ -1,0 +1,66 @@
+name: Publish image to AWS public ECR
+
+on:
+  workflow_call:
+    inputs:
+      IMAGE_NAME:
+        description: "Name of image"
+        required: true
+        type: string
+      IMAGE_TAG:
+        description: "Tag name"
+        required: true
+        type: string
+    vars:
+      AWS_REGION:
+        description: "AWS region e.g. eu-west-2"
+        required: true
+      AWS_ROLE_ARN:
+        description: "AWS role ARN e.g. arn:aws:iam::1234567890:role/role-name"
+        required: true
+      AWS_ECR:
+        description: "AWS ECR name e.g. public.ecr.aws/12345abc"
+        required: true
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check tag
+        run: echo ${{ inputs.IMAGE_TAG }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Amazon ECR
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+        # This will cache Docker layers.
+        # We could also cache the cache mounts used in the Dockerfile but do not,
+        # see https://docs.docker.com/build/ci/github-actions/cache/
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          tags: ${{ vars.AWS_ECR }}/${{ inputs.IMAGE_NAME }}:${{ inputs.IMAGE_TAG }}
+          build-args: |
+            GIT_REF_NAME=${{ github.ref_name }}
+            GIT_SHA=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
