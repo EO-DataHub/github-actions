@@ -1,6 +1,4 @@
-# Deprecated for more generic get-version-tag.yaml
-
-name: Get-Docker-Tag
+name: Get-Version-Tag
 on:
   workflow_call:
     inputs:
@@ -8,15 +6,15 @@ on:
         description: Github ref name
         type: string
     outputs:
-      image-tag:
-        description: Docker image tag
-        value: ${{ jobs.tag.outputs.image-tag }}
+      version:
+        description: Version tag
+        value: ${{ jobs.tag.outputs.version }}
 jobs:
   tag:
-    name: Extract Docker image tag
+    name: Extract version tag
     runs-on: ubuntu-latest
     outputs:
-      image-tag: ${{ steps.tag.outputs.tag }}
+      version: ${{ steps.tag.outputs.tag }}
     steps:
       - run: "echo github ref: ${{ inputs.github-ref }}"
       - id: tag

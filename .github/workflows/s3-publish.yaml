@@ -1,0 +1,44 @@
+name: Publish to S3 bucket
+
+on:
+  workflow_call:
+    inputs:
+      APP_ARTIFACT:
+        description: Name of an existing app artifact directory, e.g. workflow-artifact
+        required: true
+        type: string
+      S3_PATH:
+        description: Full S3 path, e.g. s3://bucket-name/path/to/folder
+        required: true
+        type: string
+      AWS_REGION:
+        description: AWS region, e.g. us-east-1
+        required: true
+        type: string
+      AWS_ROLE_ARN:
+        description: AWS role ARN e.g. arn:aws:iam::1234567890:role/role-name
+        required: true
+        type: string
+jobs:
+  s3:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Log message
+        run: echo "Uploading ${{ inputs.APP_ARTIFACT }} to ${{ inputs.S3_PATH }}"
+      - name: Download app artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.APP_ARTIFACT }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ inputs.AWS_ROLE_ARN }}
+          aws-region: ${{ inputs.AWS_REGION }}
+      - name: Deploy static site to S3 bucket
+        run: >
+          aws s3 sync . ${{ inputs.S3_PATH }} --delete
+          $(if [[ "${GITHUB_REF_TYPE}" = "branch" ]]; then echo --cache-control no-cache;
+          else echo --cache-control max-age=31536000; fi)
