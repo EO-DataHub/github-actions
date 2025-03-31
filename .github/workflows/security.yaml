@@ -25,6 +25,7 @@ jobs:
           skips: B101
 
 
+
       - name: Write Trivy config file
         run: |
           cat <<EOF > trivy.conf
