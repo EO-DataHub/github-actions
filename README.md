@@ -1,1 +1,31 @@
 # GitHub Actions
+
+This repository contains workflows for GitHub actions used by the EO-DataHub. They can be used as per the following example:
+
+```commandline
+jobs:
+  pre-commit-preparation:
+    name: Pre-commit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+
+      - name: Copy config
+        run: |
+          if [ ! -f .pre-commit-config.yaml ]; then
+            curl -o .pre-commit-config.yaml https://raw.githubusercontent.com/EO-DataHub/github-actions/main/.pre-commit-config-python.yaml
+          fi          
+
+      - uses: pre-commit/action@v3.0.1
+
+  security-scan:
+    name: Call Security Scan
+    uses: EO-DataHub/github-actions/.github/workflows/security.yaml@main
+
+  unit-tests:
+    name: Run unit tests
+    uses: EO-DataHub/github-actions/.github/workflows/unit-tests-python.yaml@main
+    with:
+      PYTHON_VERSION: "3.12"
+```
