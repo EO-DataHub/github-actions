@@ -2,7 +2,7 @@
 
 This repository contains workflows for GitHub actions used by the EO-DataHub. They can be used as per the following example:
 
-```commandline
+```
 jobs:
   pre-commit-preparation:
     name: Pre-commit
