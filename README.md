@@ -7,6 +7,8 @@ jobs:
   pre-commit-preparation:
     name: Pre-commit
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
@@ -21,10 +23,14 @@ jobs:
 
   security-scan:
     name: Call Security Scan
+    permissions:
+      contents: read
     uses: EO-DataHub/github-actions/.github/workflows/security.yaml@main
 
   unit-tests:
     name: Run unit tests
+    permissions:
+      contents: read
     uses: EO-DataHub/github-actions/.github/workflows/unit-tests-python.yaml@main
     with:
       PYTHON_VERSION: "3.12"
