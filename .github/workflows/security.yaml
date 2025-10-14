@@ -4,26 +4,28 @@ on:
   workflow_call:
     inputs:
       ENABLE_BANDIT:
-        description: 'Enable the Bandit scanner - useful for Python only'
+        description: "Enable the Bandit scanner - useful for Python only"
         default: true
         type: boolean
 jobs:
   build:
     name: Check for vulnerabilities
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Security check - Bandit
-        uses: mdegis/bandit-action@v1.0.1
+      - name: Set up Python
+        uses: actions/setup-python@v5
         if: ${{ inputs.ENABLE_BANDIT }}
         with:
-          path: "."
-          level: high
-          confidence: high
-          skips: B101
+          python-version: "3.x"
 
+      - name: Security check - Bandit
+        if: ${{ inputs.ENABLE_BANDIT }}
+        run: |
+          pip install bandit
+          bandit -r . -ll -ii -s B101
 
       - name: Write Trivy config file
         run: |
@@ -42,8 +44,8 @@ jobs:
       - name: Security check - Trivy
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          severity: 'MEDIUM,CRITICAL,HIGH'
-          exit-code: '1'
-          trivy-config: 'trivy.conf'
+          scan-type: "fs"
+          scan-ref: "."
+          severity: "MEDIUM,CRITICAL,HIGH"
+          exit-code: "1"
+          trivy-config: "trivy.conf"
