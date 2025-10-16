@@ -10,10 +10,10 @@ on:
 jobs:
   build:
     name: Check for vulnerabilities
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Security check - Bandit
         uses: mdegis/bandit-action@v1.0.1
