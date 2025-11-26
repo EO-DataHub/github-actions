@@ -23,7 +23,7 @@ repos:
         args: [--check]
 
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.18
+    rev: v0.24.1
     hooks:
       - id: validate-pyproject
         # Optional extra validations from SchemaStore:
