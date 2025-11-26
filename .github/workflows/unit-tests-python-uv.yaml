@@ -1,0 +1,40 @@
+name: Unit tests (uv)
+
+on:
+  workflow_call:
+    inputs:
+      PYTHON_VERSION:
+        description: 'Python version'
+        default: ''
+        required: false
+        type: string
+      TESTS_PATH:
+        description: 'Path to tests'
+        default: '.'
+        required: false
+        type: string
+      PYTEST_ARGS:
+        description: 'Additional pytest arguments'
+        default: '-vv'
+        required: false
+        type: string
+jobs:
+  unit-testing:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install ${{ inputs.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: uv sync --frozen --all-extras --dev
+
+      - name: Run tests
+        run: uv run pytest ${{ inputs.TESTS_PATH }} ${{ inputs.PYTEST_ARGS }}
