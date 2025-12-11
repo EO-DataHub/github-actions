@@ -34,13 +34,13 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check tag
         run: echo ${{ inputs.IMAGE_TAG }}
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v5
         with:
           role-to-assume: ${{ inputs.AWS_ROLE_ARN }}
           aws-region: us-east-1 # This is the region for the public ECR
