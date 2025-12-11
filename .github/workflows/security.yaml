@@ -34,13 +34,19 @@ jobs:
           EOF
 
       - name: Security check - Trivy
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           scan-type: 'fs'
           scan-ref: '.'
           severity: 'MEDIUM,CRITICAL,HIGH'
           exit-code: '1'
           trivy-config: 'trivy.conf'
+          format: 'table'
+          output: 'trivy-results.txt'
+
+      - name: Print Trivy results
+        if: always()
+        run: cat trivy-results.txt
 
 
   semgrep:
