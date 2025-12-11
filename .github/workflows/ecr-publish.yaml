@@ -19,6 +19,11 @@ on:
         description: AWS ECR alias, e.g. a1b2c3d4
         required: true
         type: string
+      BUILD_CONTEXT:
+        description: Docker build context path
+        required: false
+        type: string
+        default: '.'
 
 jobs:
   docker:
@@ -58,6 +63,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
+          context: ${{ inputs.BUILD_CONTEXT }}
           push: true
           tags: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.AWS_ECR_ALIAS }}/${{ inputs.IMAGE_NAME }}:${{ inputs.IMAGE_TAG }}
           build-args: |
