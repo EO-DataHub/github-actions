@@ -44,7 +44,7 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check tag
         run: echo ${{ inputs.IMAGE_TAG }}
