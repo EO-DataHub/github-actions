@@ -64,9 +64,11 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.AWS_ECR_ALIAS }}/${{ inputs.IMAGE_NAME }}
+          flavor: |
+            latest=false
           tags: |
             # main branch -> "latest"
-            type=raw,value=latest,enable=${{ github.ref_name == 'main' }}
+            type=raw,value=latest,enable={{is_default_branch}}
             # versioned tags (v1.0.0) -> "1.0.0" (strip v prefix)
             type=semver,pattern={{version}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
             # other refs -> ref name as-is
