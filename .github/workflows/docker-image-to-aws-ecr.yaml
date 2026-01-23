@@ -1,4 +1,8 @@
+#
 # Deprecated for ecr-publish.yaml
+#
+# =================================
+
 
 name: Publish Docker image to AWS ECR
 
