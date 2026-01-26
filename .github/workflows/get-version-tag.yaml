@@ -1,3 +1,8 @@
+#
+# Deprecated for ecr-publish.yaml
+#
+# =================================
+
 name: Get-Version-Tag
 on:
   workflow_call:
