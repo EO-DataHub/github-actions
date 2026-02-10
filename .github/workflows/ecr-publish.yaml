@@ -25,6 +25,11 @@ on:
         required: false
         type: string
         default: '.'
+      BUILD_ARGS:
+        description: Optional Docker build args (multiline KEY=VALUE, one per line)
+        required: false
+        type: string
+        default: ''
 
 jobs:
   docker:
@@ -90,5 +95,6 @@ jobs:
           build-args: |
             GIT_REF_NAME=${{ github.ref_name }}
             GIT_SHA=${{ github.sha }}
+            ${{ inputs.BUILD_ARGS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
