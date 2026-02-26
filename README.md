@@ -29,6 +29,6 @@ jobs:
 ```
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>EO-DataHub/github-actions"]
+  "extends": ["github>EO-DataHub/github-actions//renovate.json5"]
 }
 ```
