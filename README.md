@@ -21,3 +21,14 @@ jobs:
     with:
       PYTHON_VERSION: "3.12"
 ```
+
+## Renovate config
+
+`renovate.json5` defines configuration of Renovate Bot to maintain and upgrade dependencies. This is easily reusable by extending the project's Renovate config (`.github/renovate.json`):
+
+```
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>EO-DataHub/github-actions"]
+}
+```

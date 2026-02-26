@@ -1,0 +1,65 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+
+  "extends": [
+    // Core behavior
+    ":dependencyDashboard",
+    ":configMigration",
+    ":semanticCommits",
+    ":semanticPrefixFixDepsChoreOthers",
+    ":ignoreModulesAndTests",
+
+    // Grouping
+    "group:monorepos",
+    "group:recommended",
+
+    // Scheduling & automerge
+    "schedule:weekly",
+    ":maintainLockFilesWeekly",
+    ":automergePatch",
+
+    // Pinning
+    ":pinDevDependencies",
+    "docker:pinDigests",
+    "helpers:pinGitHubActionDigests",
+
+    // Security
+    "security:minimumReleaseAgeNpm",
+    "security:openssf-scorecard",
+    "mergeConfidence:age-confidence-badges",
+
+    // Docker
+    "preview:dockerCompose",
+    "preview:dockerVersions",
+
+    // Housekeeping
+    "abandonments:recommended",
+    "replacements:all",
+    "workarounds:all",
+    "helpers:githubDigestChangelogs"
+  ],
+
+  "prConcurrentLimit": 5,
+
+  // This requires "Dependabot alerts" enabled
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "addLabels": ["security"],
+    "schedule": ["at any time"]
+  },
+
+  "packageRules": [
+    {
+      "description": "Skip internal reusable workflows and actions",
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": ["EO-DataHub/github-actions"],
+      "enabled": false
+    },
+    {
+      "description": "Pin dev dependency-groups (dependency groups PEP 735)",
+      "matchManagers": ["pep621"],
+      "matchDepTypes": ["dependency-groups"],
+      "rangeStrategy": "pin"
+    }
+  ]
+}
