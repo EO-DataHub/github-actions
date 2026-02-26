@@ -30,6 +30,11 @@ on:
         required: false
         type: string
         default: ''
+      cleanup:
+        description: Run storage optimizer before build (frees disk space)
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   docker:
@@ -81,6 +86,10 @@ jobs:
             # other refs -> ref name as-is
             type=ref,event=branch,enable=${{ github.ref_name != 'main' && !startsWith(github.ref, 'refs/tags/') }}
             type=ref,event=tag,enable=${{ startsWith(github.ref, 'refs/tags/') && !startsWith(github.ref, 'refs/tags/v') }}
+
+      - name: Storage optimize
+        if: ${{ inputs.cleanup }}
+        uses: sparkgeo/github-actions/.github/actions/storage-optimizer@main
 
         # This will cache Docker layers.
         # We could also cache the cache mounts used in the Dockerfile but do not,
