@@ -89,7 +89,7 @@ jobs:
 
       - name: Storage optimize
         if: ${{ inputs.cleanup }}
-        uses: sparkgeo/github-actions/.github/actions/storage-optimizer@main
+        uses: .github/actions/storage-optimizer@main
 
         # This will cache Docker layers.
         # We could also cache the cache mounts used in the Dockerfile but do not,
