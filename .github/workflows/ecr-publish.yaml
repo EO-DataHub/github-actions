@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       IMAGE_TAG:
-        description: "[DEPRECATED: tags are now auto-generated] Tag name"
+        description: "Optional tag override. When provided, used as the sole Docker image tag. When omitted, tags are auto-generated from git refs."
         required: false
         type: string
         default: ''
@@ -36,9 +36,20 @@ on:
         type: boolean
         default: false
 
+    outputs:
+      tags:
+        description: Generated Docker image tags
+        value: ${{ jobs.docker.outputs.tags }}
+      labels:
+        description: Generated Docker image labels
+        value: ${{ jobs.docker.outputs.labels }}
+
 jobs:
   docker:
     runs-on: ubuntu-latest
+    outputs:
+      tags: ${{ steps.meta-auto.outputs.tags || steps.meta-override.outputs.tags }}
+      labels: ${{ steps.meta-auto.outputs.labels || steps.meta-override.outputs.labels }}
 
     permissions:
       id-token: write
@@ -46,10 +57,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-
-      - name: Check tag
-        if: inputs.IMAGE_TAG != ''
-        run: echo "::warning::IMAGE_TAG input is deprecated and ignored. Tags are now auto-generated."
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v5
@@ -69,8 +76,9 @@ jobs:
       - name: Check ECR registry
         run: echo ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.AWS_ECR_ALIAS }}
 
-      - name: Docker metadata
-        id: meta
+      - name: Docker metadata (auto-generated tags)
+        id: meta-auto
+        if: inputs.IMAGE_TAG == ''
         uses: docker/metadata-action@v5
         with:
           images: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.AWS_ECR_ALIAS }}/${{ inputs.IMAGE_NAME }}
@@ -87,11 +95,22 @@ jobs:
             type=ref,event=branch,enable=${{ github.ref_name != 'main' && !startsWith(github.ref, 'refs/tags/') }}
             type=ref,event=tag,enable=${{ startsWith(github.ref, 'refs/tags/') && !startsWith(github.ref, 'refs/tags/v') }}
 
+      - name: Docker metadata (explicit tag)
+        id: meta-override
+        if: inputs.IMAGE_TAG != ''
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.AWS_ECR_ALIAS }}/${{ inputs.IMAGE_NAME }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=${{ inputs.IMAGE_TAG }}
+
       - name: Storage optimize
         if: ${{ inputs.cleanup }}
         uses: .github/actions/storage-optimizer@main
 
-        # This will cache Docker layers.
+      # This will cache Docker layers.
         # We could also cache the cache mounts used in the Dockerfile but do not,
         # see https://docs.docker.com/build/ci/github-actions/cache/
       - name: Build and push
@@ -99,8 +118,8 @@ jobs:
         with:
           context: ${{ inputs.BUILD_CONTEXT }}
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-auto.outputs.tags || steps.meta-override.outputs.tags }}
+          labels: ${{ steps.meta-auto.outputs.labels || steps.meta-override.outputs.labels }}
           build-args: |
             GIT_REF_NAME=${{ github.ref_name }}
             GIT_SHA=${{ github.sha }}
