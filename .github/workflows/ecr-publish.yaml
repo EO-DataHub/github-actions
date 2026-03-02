@@ -30,6 +30,11 @@ on:
         required: false
         type: string
         default: ''
+      cleanup:
+        description: Run storage optimizer before build (frees disk space)
+        required: false
+        type: boolean
+        default: false
 
     outputs:
       tags:
@@ -100,6 +105,10 @@ jobs:
             latest=false
           tags: |
             type=raw,value=${{ inputs.IMAGE_TAG }}
+
+      - name: Storage optimize
+        if: ${{ inputs.cleanup }}
+        uses: .github/actions/storage-optimizer@main
 
       # This will cache Docker layers.
         # We could also cache the cache mounts used in the Dockerfile but do not,
