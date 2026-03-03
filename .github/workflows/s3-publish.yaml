@@ -29,7 +29,7 @@ jobs:
       - name: Log message
         run: echo "Uploading ${{ inputs.APP_ARTIFACT }} to ${{ inputs.S3_PATH }}"
       - name: Download app artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8
         with:
           name: ${{ inputs.APP_ARTIFACT }}
       - name: Configure AWS credentials
