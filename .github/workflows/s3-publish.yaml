@@ -29,11 +29,11 @@ jobs:
       - name: Log message
         run: echo "Uploading ${{ inputs.APP_ARTIFACT }} to ${{ inputs.S3_PATH }}"
       - name: Download app artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: ${{ inputs.APP_ARTIFACT }}
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4
         with:
           role-to-assume: ${{ inputs.AWS_ROLE_ARN }}
           aws-region: ${{ inputs.AWS_REGION }}
