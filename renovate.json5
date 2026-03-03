@@ -40,6 +40,7 @@
   ],
 
   "prConcurrentLimit": 5,
+  "addLabels": ["dependencies"],
 
   // This requires "Dependabot alerts" enabled
   "vulnerabilityAlerts": {
@@ -54,6 +55,19 @@
       "matchManagers": ["github-actions"],
       "matchPackageNames": ["EO-DataHub/github-actions"],
       "enabled": false
+    },
+    {
+      "description": "Group GitHub Actions non-major updates and automerge",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "groupName": "GitHub Actions (non-major)",
+      "automerge": true
+    },
+    {
+      "description": "Group GitHub Actions major updates for review",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "GitHub Actions (major)"
     },
     {
       "description": "Pin dev dependency-groups (dependency groups PEP 735)",
