@@ -34,7 +34,7 @@ jobs:
           EOF
 
       - name: Security check - Trivy
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@c1824fd6edce30d7ab345a9989de00bbd46ef284 # 0.34.0
         with:
           scan-type: 'fs'
           scan-ref: '.'
