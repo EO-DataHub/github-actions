@@ -46,7 +46,9 @@
   "vulnerabilityAlerts": {
     "enabled": true,
     "addLabels": ["security"],
-    "schedule": ["at any time"]
+    "schedule": ["at any time"],
+    "automerge": true,
+    "matchConfidence": ["high", "very high"]
   },
 
   "packageRules": [
