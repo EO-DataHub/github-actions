@@ -47,11 +47,15 @@
     "enabled": true,
     "addLabels": ["security"],
     "schedule": ["at any time"],
-    "automerge": true,
-    "matchConfidence": ["high", "very high"]
   },
 
   "packageRules": [
+    {
+      "description": "Auto-merge high-confidence security updates",
+      "matchCategories": ["security"],
+      "matchConfidence": ["high", "very high"],
+      "automerge": true
+    },
     {
       "description": "Skip internal reusable workflows and actions",
       "matchManagers": ["github-actions"],
