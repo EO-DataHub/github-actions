@@ -51,12 +51,6 @@
 
   "packageRules": [
     {
-      "description": "Auto-merge high-confidence security updates",
-      "matchCategories": ["security"],
-      "matchConfidence": ["high", "very high"],
-      "automerge": true
-    },
-    {
       "description": "Skip internal reusable workflows and actions",
       "matchManagers": ["github-actions"],
       "matchPackageNames": ["EO-DataHub/github-actions"],
