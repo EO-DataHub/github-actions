@@ -24,7 +24,6 @@
     "helpers:pinGitHubActionDigests",
 
     // Security
-    "security:minimumReleaseAgeNpm",
     "security:openssf-scorecard",
     "mergeConfidence:age-confidence-badges",
 
@@ -39,6 +38,7 @@
     "helpers:githubDigestChangelogs"
   ],
 
+  "minimumReleaseAge": "7 days",
   "prConcurrentLimit": 5,
   "addLabels": ["dependencies"],
 
