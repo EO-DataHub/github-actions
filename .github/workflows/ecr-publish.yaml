@@ -79,7 +79,7 @@ jobs:
       - name: Docker metadata (auto-generated tags)
         id: meta-auto
         if: inputs.IMAGE_TAG == ''
-        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
         with:
           images: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.AWS_ECR_ALIAS }}/${{ inputs.IMAGE_NAME }}
           flavor: |
@@ -98,7 +98,7 @@ jobs:
       - name: Docker metadata (explicit tag)
         id: meta-override
         if: inputs.IMAGE_TAG != ''
-        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
         with:
           images: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.AWS_ECR_ALIAS }}/${{ inputs.IMAGE_NAME }}
           flavor: |
