@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Write Trivy config file
         run: |
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ inputs.ENABLE_BANDIT || inputs.ENABLE_SAST }}
     container:
-      image: semgrep/semgrep@sha256:7cad2bc2d1e44f87f0bf4be6d1fa23aa90fb72015bebc89fb91385d813987a03
+      image: semgrep/semgrep@sha256:98c2572fced2474539fd27cab3207ebd8e95e4e7aab4c3b381fdc5e2641d9941
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - run: semgrep scan --config auto
