@@ -99,6 +99,14 @@
       "matchManagers": ["pep621"],
       "matchDepTypes": ["dependency-groups"],
       "rangeStrategy": "pin"
+    },
+    {
+      "description": "Python runtime bumps are policy-major: own PR, dashboard approval, never automerged",
+      "matchManagers": ["pep621"],
+      "matchDepNames": ["python"],
+      "groupName": "python runtime",
+      "dependencyDashboardApproval": true,
+      "automerge": false
     }
   ]
 }
