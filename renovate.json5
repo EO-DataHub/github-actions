@@ -107,6 +107,32 @@
       "groupName": "python runtime",
       "dependencyDashboardApproval": true,
       "automerge": false
+    },
+    {
+      "description": "Python runtime via Docker/pyenv (.python-version, FROM python:X.Y) joins the python runtime group",
+      "matchDatasources": ["docker"],
+      "matchDepNames": ["python"],
+      "matchUpdateTypes": ["major", "minor"],
+      "groupName": "python runtime",
+      "dependencyDashboardApproval": true,
+      "automerge": false
+    },
+    {
+      "description": "ghcr.io/astral-sh/uv:pythonX.Y-<distro>: version = bundled Python, distro suffix = compatibility (uv itself floats, so uv releases arrive as digest bumps)",
+      "matchDatasources": ["docker"],
+      "matchDepNames": ["ghcr.io/astral-sh/uv"],
+      "matchCurrentValue": "/^python\\d+\\.\\d+-/",
+      "versioning": "regex:^python(?<major>\\d+)\\.(?<minor>\\d+)-(?<compatibility>[a-z0-9-]+)$"
+    },
+    {
+      "description": "Python bump inside the uv base image joins the python runtime group",
+      "matchDatasources": ["docker"],
+      "matchDepNames": ["ghcr.io/astral-sh/uv"],
+      "matchCurrentValue": "/^python\\d+\\.\\d+-/",
+      "matchUpdateTypes": ["major", "minor"],
+      "groupName": "python runtime",
+      "dependencyDashboardApproval": true,
+      "automerge": false
     }
   ]
 }
