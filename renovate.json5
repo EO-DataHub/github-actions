@@ -43,7 +43,21 @@
   "prConcurrentLimit": 5,
   "addLabels": ["dependencies"],
 
-  "lockFileMaintenance": { "automerge": true },
+  // Lock file maintenance has no release timestamp, so Renovate would leave
+  // renovate/stability-days pending forever. The cooldown for lock contents comes
+  // from the resolver instead (uv exclude-newer, npm min-release-age).
+  "lockFileMaintenance": {
+    "automerge": true,
+    "minimumReleaseAgeBehaviour": "timestamp-optional"
+  },
+
+  // timestamp-optional warns on every run; keep it off the dependency dashboards
+  "logLevelRemap": [
+    {
+      "matchMessage": "/Some .+ did not have a releaseTimestamp, but as we're running with minimumReleaseAgeBehaviour=timestamp-optional, proceeding/",
+      "newLogLevel": "info"
+    }
+  ],
 
   // This requires "Dependabot alerts" enabled
   "vulnerabilityAlerts": {
