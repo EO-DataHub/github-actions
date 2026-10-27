@@ -27,6 +27,16 @@ on:
         required: false
         type: number
         default: 95
+      envtest-k8s-version:
+        description: "Kubernetes version of the envtest binaries to install; empty skips envtest"
+        required: false
+        type: string
+        default: ""
+      setup-envtest-version:
+        description: "setup-envtest version, matching the repo's controller-runtime release branch"
+        required: false
+        type: string
+        default: "release-0.19"
 permissions:
   contents: read
 jobs:
@@ -54,6 +64,15 @@ jobs:
         run: |
           go mod download
           go install github.com/ctrf-io/go-ctrf-json-reporter/cmd/go-ctrf-json-reporter@latest
+      - name: Install envtest binaries
+        if: inputs.envtest-k8s-version != ''
+        env:
+          SETUP_ENVTEST_VERSION: ${{ inputs.setup-envtest-version }}
+          ENVTEST_K8S_VERSION: ${{ inputs.envtest-k8s-version }}
+        run: |
+          go install "sigs.k8s.io/controller-runtime/tools/setup-envtest@${SETUP_ENVTEST_VERSION}"
+          assets="$(setup-envtest use "${ENVTEST_K8S_VERSION}" --bin-dir "${RUNNER_TEMP}/envtest" -p path)"
+          echo "KUBEBUILDER_ASSETS=${assets}" >> "$GITHUB_ENV"
       - name: Test with Go (with coverage report)
         id: test
         run: go test -coverprofile cover.out -json ./... | tee test.out
