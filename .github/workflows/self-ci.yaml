@@ -12,3 +12,9 @@ jobs:
     permissions:
       contents: read
     uses: $/.github/workflows/zizmor.yaml
+
+  secret-scan:
+    name: Secret scan
+    permissions:
+      contents: read
+    uses: $/.github/workflows/secret-scan.yaml
