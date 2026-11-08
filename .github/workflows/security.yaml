@@ -11,6 +11,10 @@ on:
         description: 'Enable SAST scanning with Semgrep'
         default: true
         type: boolean
+      ENABLE_SECRET_SCAN:
+        description: 'Enable secret scanning with gitleaks'
+        default: false
+        type: boolean
 permissions:
   contents: read
 jobs:
@@ -64,3 +68,10 @@ jobs:
         with:
           persist-credentials: false
       - run: semgrep scan --config auto
+
+  secret-scan:
+    name: Secret scan
+    if: ${{ inputs.ENABLE_SECRET_SCAN }}
+    permissions:
+      contents: read
+    uses: EO-DataHub/github-actions/.github/workflows/secret-scan.yaml@main
