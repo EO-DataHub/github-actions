@@ -92,7 +92,7 @@ jobs:
         run: |
           cat ctrf-report.json | jq '.results.summary' > summary.json
           cat summary.json
-          if [ $(jq '.failed' summary.json) -gt 0 ]; then
+          if [ "$(jq '.failed' summary.json)" -gt 0 ]; then
             echo "Tests failed"
             exit 1
           else

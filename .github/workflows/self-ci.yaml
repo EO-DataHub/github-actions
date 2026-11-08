@@ -18,3 +18,9 @@ jobs:
     permissions:
       contents: read
     uses: $/.github/workflows/secret-scan.yaml
+
+  actionlint:
+    name: actionlint
+    permissions:
+      contents: read
+    uses: $/.github/workflows/actionlint.yaml
