@@ -1,0 +1,14 @@
+name: Self CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions: {}
+
+jobs:
+  zizmor:
+    name: zizmor
+    permissions:
+      contents: read
+    uses: $/.github/workflows/zizmor.yaml

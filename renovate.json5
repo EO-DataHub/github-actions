@@ -152,6 +152,13 @@
       "groupName": "python runtime",
       "dependencyDashboardApproval": true,
       "automerge": false
+    },
+    {
+      "description": "zizmor-action bumps can add new audits that fail every caller: own PR, never automerged",
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": ["zizmorcore/zizmor-action"],
+      "groupName": "zizmor",
+      "automerge": false
     }
   ]
 }

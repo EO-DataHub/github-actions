@@ -1,0 +1,5 @@
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        "EO-DataHub/*": ref-pin
