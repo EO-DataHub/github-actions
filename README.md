@@ -73,6 +73,8 @@ jobs:
       config: "" # default: .gitleaks.toml if present, else built-in rules
 ```
 
+Repos already calling `security.yaml` can set `ENABLE_SECRET_SCAN: true` instead.
+
 If a real secret is found, rotate it. Removing it from the history is not enough.
 
 To ignore a false positive, add a `gitleaks:allow` comment on the line, or add its fingerprint from the job log to `.gitleaksignore`. Old secrets in history don't block pull requests, but a full scan fails until they are rotated and ignored. Run one with `workflow_dispatch` when adding the workflow to a repo.
