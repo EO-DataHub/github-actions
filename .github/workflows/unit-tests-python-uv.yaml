@@ -23,7 +23,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install uv
         uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
@@ -31,10 +33,15 @@ jobs:
           enable-cache: true
 
       - name: Set up Python
-        run: uv python install ${{ inputs.PYTHON_VERSION }}
+        env:
+          PYTHON_VERSION: ${{ inputs.PYTHON_VERSION }}
+        run: uv python install "${PYTHON_VERSION}"
 
       - name: Install dependencies
         run: uv sync --frozen --all-extras --dev
 
       - name: Run tests
-        run: uv run pytest ${{ inputs.TESTS_PATH }} ${{ inputs.PYTEST_ARGS }}
+        env:
+          TESTS_PATH: ${{ inputs.TESTS_PATH }}
+          PYTEST_ARGS: ${{ inputs.PYTEST_ARGS }}
+        run: uv run pytest ${TESTS_PATH} ${PYTEST_ARGS}
