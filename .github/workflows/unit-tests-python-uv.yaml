@@ -44,4 +44,6 @@ jobs:
         env:
           TESTS_PATH: ${{ inputs.TESTS_PATH }}
           PYTEST_ARGS: ${{ inputs.PYTEST_ARGS }}
-        run: uv run pytest ${TESTS_PATH} ${PYTEST_ARGS}
+        run: |
+          # shellcheck disable=SC2086
+          uv run pytest "${TESTS_PATH}" ${PYTEST_ARGS}
