@@ -60,7 +60,7 @@ The same file is where findings can be ignored (`rules.<id>.ignore`), or use an 
 
 ## Secret scan
 
-`secret-scan.yaml` scans the full git history with [gitleaks](https://github.com/gitleaks/gitleaks) and fails if it finds a secret.
+`secret-scan.yaml` scans git history with [gitleaks](https://github.com/gitleaks/gitleaks) and fails if it finds a secret. On pull requests and pushes it scans only the new commits. On other events, such as a `schedule` or `workflow_dispatch`, it scans the full history.
 
 ```
 jobs:
@@ -75,7 +75,7 @@ jobs:
 
 If a real secret is found, rotate it. Removing it from the history is not enough.
 
-To ignore a false positive, add a `gitleaks:allow` comment on the line, or add its fingerprint from the job log to `.gitleaksignore`. Existing secrets in old history will fail every run until they are rotated and ignored, so run the scan once and clean up before adding it to a repo.
+To ignore a false positive, add a `gitleaks:allow` comment on the line, or add its fingerprint from the job log to `.gitleaksignore`. Old secrets in history don't block pull requests, but a full scan fails until they are rotated and ignored. Run one with `workflow_dispatch` when adding the workflow to a repo.
 
 ## Renovate config
 
