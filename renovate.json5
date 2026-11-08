@@ -74,6 +74,11 @@
       "enabled": false
     },
     {
+      "description": "Digest updates are aged at lookup but lose the timestamp before the branch check, leaving stability-days pending (renovatebot/renovate#45236)",
+      "matchUpdateTypes": ["digest", "pinDigest"],
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
+    },
+    {
       "description": "Automerge ALL non-major updates after CI passes + cooldown",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
