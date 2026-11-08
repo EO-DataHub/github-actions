@@ -91,6 +91,13 @@
       "groupName": "github actions (non-major)"
     },
     {
+      "description": "gitleaks: new rules can fail callers, so review updates manually",
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": ["ghcr.io/gitleaks/gitleaks"],
+      "groupName": "gitleaks",
+      "automerge": false
+    },
+    {
       "description": "Group JS/npm non-major",
       "matchCategories": ["js"],
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
