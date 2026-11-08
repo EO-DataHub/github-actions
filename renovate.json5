@@ -43,7 +43,21 @@
   "prConcurrentLimit": 5,
   "addLabels": ["dependencies"],
 
-  "lockFileMaintenance": { "automerge": true },
+  // Lock file maintenance has no release timestamp, so Renovate would leave
+  // renovate/stability-days pending forever. The cooldown for lock contents comes
+  // from the resolver instead (uv exclude-newer, npm min-release-age).
+  "lockFileMaintenance": {
+    "automerge": true,
+    "minimumReleaseAgeBehaviour": "timestamp-optional"
+  },
+
+  // timestamp-optional warns on every run; keep it off the dependency dashboards
+  "logLevelRemap": [
+    {
+      "matchMessage": "/Some .+ did not have a releaseTimestamp, but as we're running with minimumReleaseAgeBehaviour=timestamp-optional, proceeding/",
+      "newLogLevel": "info"
+    }
+  ],
 
   // This requires "Dependabot alerts" enabled
   "vulnerabilityAlerts": {
@@ -58,6 +72,11 @@
       "matchManagers": ["github-actions"],
       "matchPackageNames": ["EO-DataHub/github-actions"],
       "enabled": false
+    },
+    {
+      "description": "Digest updates are aged at lookup but lose the timestamp before the branch check, leaving stability-days pending (renovatebot/renovate#45236)",
+      "matchUpdateTypes": ["digest", "pinDigest"],
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
     },
     {
       "description": "Automerge ALL non-major updates after CI passes + cooldown",
