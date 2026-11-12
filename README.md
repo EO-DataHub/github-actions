@@ -79,6 +79,20 @@ If a real secret is found, rotate it. Removing it from the history is not enough
 
 To ignore a false positive, add a `gitleaks:allow` comment on the line, or add its fingerprint from the job log to `.gitleaksignore`. Old secrets in history don't block pull requests, but a full scan fails until they are rotated and ignored. Run one with `workflow_dispatch` when adding the workflow to a repo.
 
+## Publishing images
+
+`ecr-publish.yaml` builds the image on every run. Where it pushes depends on the run:
+
+| Run | GitHub environment | Pushed to |
+|---|---|---|
+| Default branch or a tag | `release` | `<alias>/<image>` and `<alias>/dev/<image>`, tagged `latest`, the version, or the tag name |
+| Any other branch | `dev` | `<alias>/dev/<image>`, tagged `<branch>` and `<branch>-<short sha>` |
+| Pull request | none | nothing, build only |
+
+The AWS roles only trust these two environments of each repository, and only when the job runs this workflow from `main`. So both environments must exist in the calling repo, the repo's OIDC subject must include `job_workflow_ref`, and the workflow must be called at `@main`. `release` should allow only the default branch and release tags. `dev` needs the variable `AWS_DEV_ROLE_ARN`.
+
+`s3-publish.yaml` runs in the `release` environment.
+
 ## Renovate config
 
 `renovate.json5` defines configuration of Renovate Bot to maintain and upgrade dependencies. This is easily reusable by extending the project's Renovate config (`.github/renovate.json`):
