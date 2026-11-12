@@ -8,12 +8,12 @@ on:
         required: true
         type: string
       IMAGE_TAG:
-        description: "Optional tag override. When provided, used as the sole Docker image tag. When omitted, tags are auto-generated from git refs."
+        description: "Optional tag override. When provided, used as the sole Docker image tag. When omitted, tags are auto-generated from git refs. Ignored for dev images."
         required: false
         type: string
         default: ''
       AWS_ROLE_ARN:
-        description: AWS role ARN e.g. arn:aws:iam::1234567890:role/role-name
+        description: AWS role ARN for release images, e.g. arn:aws:iam::1234567890:role/role-name. Dev images use vars.AWS_DEV_ROLE_ARN.
         required: true
         type: string
       AWS_ECR_ALIAS:
@@ -39,17 +39,77 @@ on:
     outputs:
       tags:
         description: Generated Docker image tags
-        value: ${{ jobs.docker.outputs.tags }}
+        value: ${{ jobs.publish.outputs.tags }}
       labels:
         description: Generated Docker image labels
-        value: ${{ jobs.docker.outputs.labels }}
+        value: ${{ jobs.publish.outputs.labels }}
+
+permissions: {}
 
 jobs:
-  docker:
+  target:
     runs-on: ubuntu-latest
+    permissions: {}
     outputs:
-      tags: ${{ steps.meta-auto.outputs.tags || steps.meta-override.outputs.tags }}
-      labels: ${{ steps.meta-auto.outputs.labels || steps.meta-override.outputs.labels }}
+      environment: ${{ steps.target.outputs.environment }}
+    steps:
+      - name: Pick target
+        id: target
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          environment=""
+          if [[ "${EVENT_NAME}" != "pull_request" ]]; then
+            if [[ "${GITHUB_REF_TYPE}" == "tag" || "${GITHUB_REF_NAME}" == "${DEFAULT_BRANCH}" ]]; then
+              environment="release"
+            else
+              environment="dev"
+            fi
+          fi
+          echo "environment=${environment}" >> "${GITHUB_OUTPUT}"
+
+  build:
+    name: Build without pushing
+    needs: target
+    if: needs.target.outputs.environment == ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - name: Storage optimize
+        if: ${{ inputs.cleanup }}
+        uses: EO-DataHub/github-actions/.github/actions/storage-optimizer@main
+
+      - name: Build
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: ${{ inputs.BUILD_CONTEXT }}
+          push: false
+          build-args: |
+            GIT_REF_NAME=${{ github.ref_name }}
+            GIT_SHA=${{ github.sha }}
+            ${{ inputs.BUILD_ARGS }}
+          cache-from: type=gha
+
+  publish:
+    name: Build and push
+    needs: target
+    if: needs.target.outputs.environment != ''
+    runs-on: ubuntu-latest
+    # The AWS roles trust only the caller's release and dev environments.
+    environment: ${{ needs.target.outputs.environment }}
+    outputs:
+      tags: ${{ steps.meta-auto.outputs.tags || steps.meta-override.outputs.tags || steps.meta-dev.outputs.tags }}
+      labels: ${{ steps.meta-auto.outputs.labels || steps.meta-override.outputs.labels || steps.meta-dev.outputs.labels }}
 
     permissions:
       id-token: write
@@ -63,7 +123,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
-          role-to-assume: ${{ inputs.AWS_ROLE_ARN }}
+          role-to-assume: ${{ needs.target.outputs.environment == 'dev' && vars.AWS_DEV_ROLE_ARN || inputs.AWS_ROLE_ARN }}
           aws-region: us-east-1 # This is the region for the public ECR
 
       - name: Set up Docker Buildx
@@ -83,33 +143,48 @@ jobs:
 
       - name: Docker metadata (auto-generated tags)
         id: meta-auto
-        if: inputs.IMAGE_TAG == ''
+        if: needs.target.outputs.environment == 'release' && inputs.IMAGE_TAG == ''
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
-          images: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.AWS_ECR_ALIAS }}/${{ inputs.IMAGE_NAME }}
+          # Also push to dev/, so it has every build.
+          images: |
+            ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.AWS_ECR_ALIAS }}/${{ inputs.IMAGE_NAME }}
+            ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.AWS_ECR_ALIAS }}/dev/${{ inputs.IMAGE_NAME }}
           flavor: |
             latest=false
           tags: |
-            # main branch -> "latest"
+            # default branch -> "latest"
             type=raw,value=latest,enable={{is_default_branch}}
             # versioned tags (v1.0.0) -> "1.0.0" (strip v prefix)
             type=semver,pattern={{version}},enable=${{ startsWith(github.ref, 'refs/tags/v') }}
-            # pull requests -> source branch name (e.g., "feature-branch")
-            type=raw,value=${{ github.head_ref }},enable=${{ github.event_name == 'pull_request' }}
-            # other refs -> ref name as-is
-            type=ref,event=branch,enable=${{ github.ref_name != 'main' && !startsWith(github.ref, 'refs/tags/') }}
+            # other tags -> tag name as-is
             type=ref,event=tag,enable=${{ startsWith(github.ref, 'refs/tags/') && !startsWith(github.ref, 'refs/tags/v') }}
 
       - name: Docker metadata (explicit tag)
         id: meta-override
-        if: inputs.IMAGE_TAG != ''
+        if: needs.target.outputs.environment == 'release' && inputs.IMAGE_TAG != ''
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
-          images: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.AWS_ECR_ALIAS }}/${{ inputs.IMAGE_NAME }}
+          images: |
+            ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.AWS_ECR_ALIAS }}/${{ inputs.IMAGE_NAME }}
+            ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.AWS_ECR_ALIAS }}/dev/${{ inputs.IMAGE_NAME }}
           flavor: |
             latest=false
           tags: |
             type=raw,value=${{ inputs.IMAGE_TAG }}
+
+      - name: Docker metadata (dev image)
+        id: meta-dev
+        if: needs.target.outputs.environment == 'dev'
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ${{ steps.login-ecr-public.outputs.registry }}/${{ inputs.AWS_ECR_ALIAS }}/dev/${{ inputs.IMAGE_NAME }}
+          flavor: |
+            latest=false
+          tags: |
+            # branch name, and branch name plus short commit SHA, e.g. "my-branch-1a2b3c4"
+            type=ref,event=branch
+            type=ref,event=branch,suffix=-{{sha}}
 
       - name: Storage optimize
         if: ${{ inputs.cleanup }}
@@ -123,8 +198,8 @@ jobs:
         with:
           context: ${{ inputs.BUILD_CONTEXT }}
           push: true
-          tags: ${{ steps.meta-auto.outputs.tags || steps.meta-override.outputs.tags }}
-          labels: ${{ steps.meta-auto.outputs.labels || steps.meta-override.outputs.labels }}
+          tags: ${{ steps.meta-auto.outputs.tags || steps.meta-override.outputs.tags || steps.meta-dev.outputs.tags }}
+          labels: ${{ steps.meta-auto.outputs.labels || steps.meta-override.outputs.labels || steps.meta-dev.outputs.labels }}
           build-args: |
             GIT_REF_NAME=${{ github.ref_name }}
             GIT_SHA=${{ github.sha }}
